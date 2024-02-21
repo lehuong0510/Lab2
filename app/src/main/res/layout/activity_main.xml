@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <EditText
+        android:id="@+id/txt_Name"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:hint="Họ tên"
+        android:textSize="25sp"
+        android:layout_margin="10px" />
+    <ListView
+        android:id="@+id/lstContact"
+        android:layout_width="match_parent"
+        android:layout_marginTop="10dp"
+        android:layout_height="300dp" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="30dp">
+
+        <Button
+            android:id="@+id/btnThem"
+            style="@style/Widget.AppCompat.Button"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10px"
+            android:layout_weight="1"
+            android:background="@android:drawable/dialog_holo_light_frame"
+
+            android:rotationX="4"
+            android:stateListAnimator="@android:anim/linear_interpolator"
+            android:text="Thêm Mới"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/btnXoa"
+            style="@style/Widget.AppCompat.Button"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10px"
+            android:layout_weight="1"
+            android:background="@android:drawable/dialog_holo_light_frame"
+            android:text="Xóa"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+</LinearLayout>
