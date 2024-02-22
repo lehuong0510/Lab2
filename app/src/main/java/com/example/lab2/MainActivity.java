@@ -1,7 +1,9 @@
 package com.example.lab2;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,6 +19,8 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
 
@@ -30,11 +34,20 @@ public class MainActivity extends AppCompatActivity {
     Adapter adapter;
     ArrayList<Contact> listContact;
     ArrayList lstName;
+    private Contact lastSelectedContact;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         FindId();
+        //Cap quyen truy cap doc thu vien
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Yêu cầu quyền truy cập vào bộ nhớ
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    PERMISSION_REQUEST_CODE);
+        }
 
         listContact = new ArrayList<Contact>();
         listContact.add(new Contact(1,"A", "081", false,"https://www.vietnamworks.com/hrinsider/wp-content/uploads/2023/12/anh-den-ngau.jpeg"));
@@ -45,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onAvatarClick(Contact contact) {
                 // Xử lý sự kiện khi người dùng nhấn vào hình đại diện
+                lastSelectedContact = contact;
                 Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(intent, PICK_IMAGE);
             }
@@ -131,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
             int id = b.getInt("id");
             String name = b.getString("name");
             String phone = b.getString("phone");
-            Contact ct = new Contact(id,name,phone,false,"img");
+            Contact ct = new Contact(id,name,phone,false,"https://cdn.sforum.vn/sforum/wp-content/uploads/2023/10/avatar-trang-4.jpg");
                 listContact.add(ct);
                 lstContact.setAdapter(adapter);
                 Toast.makeText(this,"Thanh cong",Toast.LENGTH_SHORT).show();
@@ -143,18 +157,18 @@ public class MainActivity extends AppCompatActivity {
 
 
             // Cập nhật đường dẫn ảnh mới cho từng contact trong danh sách
-            if (picturePath != null) {
+            if (picturePath != null && lastSelectedContact!=null) {
 
-                for (Contact contact : listContact) {
-                    contact.setImagePath(picturePath);
-                }
+                lastSelectedContact.setImagePath(picturePath);
                 adapter.notifyDataSetChanged();
+                Toast.makeText(this, "Thay doi avt thanh cong", Toast.LENGTH_SHORT).show();
             } else {
 
                 Toast.makeText(this, "Không thể lấy đường dẫn của ảnh", Toast.LENGTH_SHORT).show();
             }
         }
     }
+
     private String getRealPathFromURI(Uri contentUri) {
         String[] projection = {MediaStore.Images.Media.DATA};
         Cursor cursor = getContentResolver().query(contentUri, projection, null, null, null);
