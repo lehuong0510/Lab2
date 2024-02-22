@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -40,6 +41,7 @@ public class Adapter extends BaseAdapter {
     private  TextView phone;
     private CheckBox cb;
     private ImageView avata;
+    private EditText txtName;
     public ArrayList<Contact> getData() {
         return data;
     }
@@ -51,6 +53,7 @@ public class Adapter extends BaseAdapter {
         this.data = data;
         this.context = context;
         this.onAvatarClickListener = onAvatarClickListener;
+        //this.txtName = txtName;
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
     @Override
@@ -105,6 +108,13 @@ public class Adapter extends BaseAdapter {
                 }
             }
         });
+
+//        v.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                txtName.setText(data.get(position).getName());
+//            }
+//        });
 
 
         return v;

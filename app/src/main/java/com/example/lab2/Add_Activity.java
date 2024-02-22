@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -20,6 +21,7 @@ public class Add_Activity extends AppCompatActivity {
     EditText phone;
     Button btnOK;
     Button btnCancel;
+    ImageView img;
     ArrayList<Integer> iddaco;
 
     @Override
@@ -28,8 +30,9 @@ public class Add_Activity extends AppCompatActivity {
         setContentView(R.layout.activity_add);
         FindID();
         Intent intent = getIntent();
-         iddaco = new ArrayList<Integer>();
+        iddaco = new ArrayList<Integer>();
         iddaco = intent.getIntegerArrayListExtra("listid");
+
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -50,8 +53,6 @@ public class Add_Activity extends AppCompatActivity {
                 });
                 AlertDialog al = dg.create();
                 al.show();
-
-
 
             }
         });
@@ -107,6 +108,7 @@ public class Add_Activity extends AppCompatActivity {
         phone = findViewById(R.id.edit_SDT);
         btnOK = findViewById(R.id.btnOK);
         btnCancel = findViewById(R.id.btnCancel);
+        img = findViewById(R.id.img_add);
     }
 
 

@@ -4,11 +4,12 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -16,6 +17,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,6 +29,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
     private static final int PICK_IMAGE = 1;
     private static final int PERMISSION_REQUEST_CODE = 100;
+    private int selectedItemId;
     protected EditText name;
     protected ListView lstContact;
     protected Button btnAdd;
@@ -35,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Contact> listContact;
     ArrayList lstName;
     private Contact lastSelectedContact;
+    private Menu menu;
+    private Contact c;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,12 +68,14 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(intent, PICK_IMAGE);
             }
         });
+
         lstContact.setAdapter(adapter);
-        lstContact.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        registerForContextMenu(lstContact);
+        lstContact.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                name.setText(listContact.get(position).getName());
-                Log.d("name","Name: " + name.getText().toString());
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                selectedItemId= position;
+                return false;
             }
         });
         btnXoa.setOnClickListener(new View.OnClickListener() {
@@ -99,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
         lstContact = findViewById(R.id.lstContact);
         btnAdd = findViewById(R.id.btnThem);
         btnXoa= findViewById(R.id.btnXoa);
+
     }
     public void XoaDS(){
             ArrayList<Contact> phanTuCanLoaiBo = new ArrayList<>();
@@ -150,33 +158,103 @@ public class MainActivity extends AppCompatActivity {
                 lstContact.setAdapter(adapter);
                 Toast.makeText(this,"Thanh cong",Toast.LENGTH_SHORT).show();
         }
-        if (requestCode == PICK_IMAGE && resultCode == RESULT_OK && data != null) {
-            Uri selectedImage = data.getData();
-            String picturePath = getRealPathFromURI(selectedImage); // Lấy đường dẫn thực của ảnh
-            Log.d("IMAGE_PATH", "Đường dẫn của ảnh: " + picturePath);
-
-
-            // Cập nhật đường dẫn ảnh mới cho từng contact trong danh sách
-            if (picturePath != null && lastSelectedContact!=null) {
-
-                lastSelectedContact.setImagePath(picturePath);
-                adapter.notifyDataSetChanged();
-                Toast.makeText(this, "Thay doi avt thanh cong", Toast.LENGTH_SHORT).show();
-            } else {
-
-                Toast.makeText(this, "Không thể lấy đường dẫn của ảnh", Toast.LENGTH_SHORT).show();
-            }
+//        if (requestCode == PICK_IMAGE && resultCode == RESULT_OK && data != null) {
+//            Uri selectedImage = data.getData();
+//            String picturePath = getRealPathFromURI(selectedImage); // Lấy đường dẫn thực của ảnh
+//            Log.d("IMAGE_PATH", "Đường dẫn của ảnh: " + picturePath);
+//
+//
+//            // Cập nhật đường dẫn ảnh mới cho từng contact trong danh sách
+//            if (picturePath != null && lastSelectedContact!=null) {
+//
+//                lastSelectedContact.setImagePath(picturePath);
+//                adapter.notifyDataSetChanged();
+//                Toast.makeText(this, "Thay doi avt thanh cong", Toast.LENGTH_SHORT).show();
+//            } else {
+//
+//                Toast.makeText(this, "Không thể lấy đường dẫn của ảnh", Toast.LENGTH_SHORT).show();
+//            }
+//        }
+        if(requestCode== 300&& resultCode==170){
+            Bundle bl =data.getExtras();
+            int id = bl.getInt("ID_edit");
+            String name = bl.getString("Name_Edit");
+            String phone = bl.getString("Phone_Edit");
+            String img= bl.getString("Image_Edit");
+            c.setId(id);
+            c.setName(name);
+            c.setPhonenumber(phone);
+            c.setImagePath(img);
+            adapter.notifyDataSetChanged();
         }
+
     }
 
-    private String getRealPathFromURI(Uri contentUri) {
-        String[] projection = {MediaStore.Images.Media.DATA};
-        Cursor cursor = getContentResolver().query(contentUri, projection, null, null, null);
-        if (cursor == null) return null;
-        cursor.moveToFirst();
-        int columnIndex = cursor.getColumnIndex(projection[0]);
-        String picturePath = cursor.getString(columnIndex);
-        cursor.close();
-        return picturePath;
+//    private String getRealPathFromURI(Uri contentUri) {
+//        String[] projection = {MediaStore.Images.Media.DATA};
+//        Cursor cursor = getContentResolver().query(contentUri, projection, null, null, null);
+//        if (cursor == null) return null;
+//        cursor.moveToFirst();
+//        int columnIndex = cursor.getColumnIndex(projection[0]);
+//        String picturePath = cursor.getString(columnIndex);
+//        cursor.close();
+//        return picturePath;
+//    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        if(item.getItemId() == R.id.sort_by_name)
+        {
+            Toast.makeText(MainActivity.this,"Ban da cho sorrt by name",Toast.LENGTH_SHORT).show();
+        }
+        if(item.getItemId() == R.id.menu_phone)
+        {
+            Toast.makeText(MainActivity.this,"Ban da chon phone",Toast.LENGTH_SHORT).show();
+        }
+        if(item.getItemId() == R.id.menu_broadcast)
+        {
+            Intent intent = new Intent("com.example.lab2.SOME_ACTION");
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = new MenuInflater(this);
+        inflater.inflate(R.menu.menu_activity,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = new MenuInflater(this);
+        inflater.inflate(R.menu.menu_context, menu);
+
+    }
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        c= listContact.get(selectedItemId);
+        if(item.getItemId()==R.id.menu_edit)
+        {
+            edit_item();
+        }
+        else if(item.getItemId()==R.id.menu_delete){
+            listContact.remove(c);
+            adapter.notifyDataSetChanged();
+       }
+        return super.onContextItemSelected(item);
+    }
+    public void edit_item(){
+        Intent i= new Intent(MainActivity.this,Update_Activity.class);
+        Bundle b = new Bundle();
+        b.putInt("id", c.getId());
+        b.putString("Image",c.getImagePath());
+        b.putString("name", c.getName());
+        b.putString("Phone",c.getPhonenumber());
+        i.putExtras(b);
+        startActivityForResult(i,300);
     }
 }

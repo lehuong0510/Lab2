@@ -38,6 +38,19 @@
             android:stateListAnimator="@android:anim/linear_interpolator"
             android:text="Thêm Mới"
             android:textSize="20sp" />
+        <Button
+            android:id="@+id/btnSua"
+            style="@style/Widget.AppCompat.Button"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10px"
+            android:layout_weight="1"
+            android:background="@android:drawable/dialog_holo_light_frame"
+
+            android:rotationX="4"
+            android:stateListAnimator="@android:anim/linear_interpolator"
+            android:text="Cập nhật"
+            android:textSize="20sp" />
 
         <Button
             android:id="@+id/btnXoa"
