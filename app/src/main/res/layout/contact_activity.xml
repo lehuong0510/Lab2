@@ -36,5 +36,12 @@
             android:hint="Phone"
             android:textSize="25sp"
             android:layout_margin="10px" />
+        <TextView
+            android:id="@+id/editEmail"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Email"
+            android:textSize="25sp"
+            android:layout_margin="10px" />
     </LinearLayout>
 </LinearLayout>

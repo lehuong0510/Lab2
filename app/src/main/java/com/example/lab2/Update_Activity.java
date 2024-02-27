@@ -23,6 +23,7 @@ public class Update_Activity extends AppCompatActivity {
     EditText id;
     EditText name ;
     EditText phone;
+    EditText email;
     Button btnEdit;
     Button btnCancel;
     ImageView img;
@@ -61,6 +62,7 @@ public class Update_Activity extends AppCompatActivity {
                 bl.putInt("ID_Edit",iid);
                 bl.putString("Name_Edit",Name);
                 bl.putString("Phone_Edit",Phone);
+                bl.putString("Email_Edit",email.getText().toString());
                 bl.putString("Image_Edit",image_path);
                 i.putExtras(bl);
                 setResult(170,i);
@@ -77,6 +79,7 @@ public class Update_Activity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode==PICK_IMAGE && resultCode== RESULT_OK&& data!=null){
            Uri url_img = data.getData();
+            Log.d("urlimg", "onActivityResult: " + url_img);
             String picturePath = getRealPathFromURI(url_img);
             image_path=picturePath;
             if(picturePath!=null){
@@ -104,6 +107,7 @@ public class Update_Activity extends AppCompatActivity {
         btnEdit = findViewById(R.id.btnEdit);
         btnCancel = findViewById(R.id.btnCancel_Upadte);
         img = findViewById(R.id.img_update);
+        email = findViewById(R.id.update_Email);
     }
     public void values_main() {
         Intent intent = getIntent();
@@ -113,14 +117,17 @@ public class Update_Activity extends AppCompatActivity {
             String namea = b.getString("name");
             String phonea = b.getString("Phone");
             String img_path = b.getString("Image");
+            String emaila = b.getString("Email");
             image_path = img_path;
             id.setText(String.valueOf(ida));
             name.setText(namea);
             phone.setText(phonea);
-            Log.d("l", "onCreate: " + img_path);
+            email.setText(emaila);
+
             Glide.with(Update_Activity.this)
                     .load(img_path)
                     .into(img);
+
         }
     }
     public  void btnCancel_OnClik(){

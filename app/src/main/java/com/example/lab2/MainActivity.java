@@ -1,9 +1,11 @@
 package com.example.lab2;
 
 import android.Manifest;
+import android.app.SearchManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.ContextMenu;
@@ -55,9 +57,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         listContact = new ArrayList<Contact>();
-        listContact.add(new Contact(1,"A", "081", false,"https://www.vietnamworks.com/hrinsider/wp-content/uploads/2023/12/anh-den-ngau.jpeg"));
-        listContact.add(new Contact(2,"B", "0819", false,"https://inkythuatso.com/uploads/thumbnails/800/2022/03/anh-dai-dien-facebook-dep-cho-nam-30-28-16-26-50.jpg"));
-        listContact.add(new Contact(3,"C", "08194", false,"https://inkythuatso.com/uploads/thumbnails/800/2022/03/anh-dai-dien-facebook-dep-cho-nam-40-28-16-27-26.jpg"));
+
+        listContact.add(new Contact(1,"A", "081","le308934@gmail.com", false,"content://media/external/images/media/23"));
+        listContact.add(new Contact(2,"B", "0819", "le308934@gamil.com",false,"https://inkythuatso.com/uploads/thumbnails/800/2022/03/anh-dai-dien-facebook-dep-cho-nam-30-28-16-26-50.jpg"));
+        listContact.add(new Contact(3,"C", "08194","le308934@gamil.com", false,"https://inkythuatso.com/uploads/thumbnails/800/2022/03/anh-dai-dien-facebook-dep-cho-nam-40-28-16-27-26.jpg"));
         //adapter = new Adapter(listContact,this);
         adapter = new Adapter(listContact, this, new Adapter.OnAvatarClickListener() {
             @Override
@@ -67,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(intent, PICK_IMAGE);
             }
-        });
+        }, name);
 
         lstContact.setAdapter(adapter);
         registerForContextMenu(lstContact);
@@ -153,7 +156,9 @@ public class MainActivity extends AppCompatActivity {
             int id = b.getInt("id");
             String name = b.getString("name");
             String phone = b.getString("phone");
-            Contact ct = new Contact(id,name,phone,false,"https://cdn.sforum.vn/sforum/wp-content/uploads/2023/10/avatar-trang-4.jpg");
+            String image_path= b.getString("img");
+            String email = b.getString("email");
+            Contact ct = new Contact(id,name,phone,email,false,image_path);
                 listContact.add(ct);
                 lstContact.setAdapter(adapter);
                 Toast.makeText(this,"Thanh cong",Toast.LENGTH_SHORT).show();
@@ -181,6 +186,8 @@ public class MainActivity extends AppCompatActivity {
             String name = bl.getString("Name_Edit");
             String phone = bl.getString("Phone_Edit");
             String img= bl.getString("Image_Edit");
+            String email= bl.getString("Email_Edit");
+            c.setEmail(email);
             c.setId(id);
             c.setName(name);
             c.setPhonenumber(phone);
@@ -214,7 +221,10 @@ public class MainActivity extends AppCompatActivity {
         }
         if(item.getItemId() == R.id.menu_broadcast)
         {
-            Intent intent = new Intent("com.example.lab2.SOME_ACTION");
+            Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
+            intent.putExtra(SearchManager.QUERY, "avt");
+            startActivity(intent);
+
         }
         return super.onOptionsItemSelected(item);
     }
@@ -245,6 +255,20 @@ public class MainActivity extends AppCompatActivity {
             listContact.remove(c);
             adapter.notifyDataSetChanged();
        }
+        else if(item.getItemId()== R.id.menu_call){
+            Intent i = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + c.getPhonenumber()));
+            startActivity(i);
+//            Intent i = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + c.getPhonenumber()));
+//            startActivity(i);
+        }
+        else if(item.getItemId()== R.id.menu_msm){
+            Intent i = new Intent(Intent.ACTION_SENDTO, Uri.parse("sms:" + c.getPhonenumber()));
+            startActivity(i);
+        }
+        else if(item.getItemId()== R.id.menu_email){
+            Intent i = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + c.getPhonenumber()));
+            startActivity(i);
+        }
         return super.onContextItemSelected(item);
     }
     public void edit_item(){
@@ -254,7 +278,8 @@ public class MainActivity extends AppCompatActivity {
         b.putString("Image",c.getImagePath());
         b.putString("name", c.getName());
         b.putString("Phone",c.getPhonenumber());
-        i.putExtras(b);
+        b.putString("Email",c.getEmail());
+       i.putExtras(b);
         startActivityForResult(i,300);
     }
 }

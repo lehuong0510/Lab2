@@ -2,6 +2,8 @@ package com.example.lab2;
 
 import android.app.Activity;
 import android.content.Context;
+import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +44,7 @@ public class Adapter extends BaseAdapter {
     private CheckBox cb;
     private ImageView avata;
     private EditText txtName;
+    private  TextView email;
     public ArrayList<Contact> getData() {
         return data;
     }
@@ -49,11 +52,11 @@ public class Adapter extends BaseAdapter {
     public void setData(ArrayList<Contact> data) {
         this.data = data;
     }
-    public  Adapter(ArrayList<Contact> data, Activity context, OnAvatarClickListener onAvatarClickListener){
+    public  Adapter(ArrayList<Contact> data, Activity context, OnAvatarClickListener onAvatarClickListener, EditText txtName){
         this.data = data;
         this.context = context;
         this.onAvatarClickListener = onAvatarClickListener;
-        //this.txtName = txtName;
+        this.txtName = txtName;
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
     @Override
@@ -80,10 +83,13 @@ public class Adapter extends BaseAdapter {
         phone = v.findViewById(R.id.editSDT);
         cb = v.findViewById(R.id.check);
         avata = v.findViewById(R.id.image);
+        email = v.findViewById(R.id.editEmail);
         name.setText(data.get(position).getName());
         phone.setText(data.get(position).getPhonenumber());
         cb.setChecked(data.get(position).isStatus());
+        email.setText(data.get(position).getEmail());
         //avata.setImageURI(Uri.parse(data.get(position).getImagePath()));
+        Log.d("a1", "getView: " + Uri.parse(data.get(position).getImagePath()));
         String imagePath = data.get(position).getImagePath();
         if (imagePath != null && !imagePath.isEmpty()) {
             Glide.with(context)
