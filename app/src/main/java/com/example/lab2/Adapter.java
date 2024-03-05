@@ -108,6 +108,7 @@ public class Adapter extends BaseAdapter {
         });
         avata.setOnClickListener(new View.OnClickListener() {
             @Override
+
             public void onClick(View v) {
                 if (onAvatarClickListener != null) {
                     onAvatarClickListener.onAvatarClick(data.get(position));

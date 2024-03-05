@@ -9,6 +9,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -28,6 +29,7 @@ public class Update_Activity extends AppCompatActivity {
     Button btnCancel;
     ImageView img;
     String image_path;
+    CheckBox status;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +66,7 @@ public class Update_Activity extends AppCompatActivity {
                 bl.putString("Phone_Edit",Phone);
                 bl.putString("Email_Edit",email.getText().toString());
                 bl.putString("Image_Edit",image_path);
+                bl.putBoolean("Status_Edit",status.isChecked());
                 i.putExtras(bl);
                 setResult(170,i);
                 finish();
@@ -108,6 +111,7 @@ public class Update_Activity extends AppCompatActivity {
         btnCancel = findViewById(R.id.btnCancel_Upadte);
         img = findViewById(R.id.img_update);
         email = findViewById(R.id.update_Email);
+        status = findViewById(R.id.update_status);
     }
     public void values_main() {
         Intent intent = getIntent();
@@ -118,11 +122,13 @@ public class Update_Activity extends AppCompatActivity {
             String phonea = b.getString("Phone");
             String img_path = b.getString("Image");
             String emaila = b.getString("Email");
+            Boolean sta= b.getBoolean("Statu");
             image_path = img_path;
             id.setText(String.valueOf(ida));
             name.setText(namea);
             phone.setText(phonea);
             email.setText(emaila);
+            status.setChecked(sta);
 
             Glide.with(Update_Activity.this)
                     .load(img_path)

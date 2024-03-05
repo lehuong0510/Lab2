@@ -38,10 +38,10 @@ public class MainActivity extends AppCompatActivity {
     protected Button btnXoa;
     Adapter adapter;
     ArrayList<Contact> listContact;
-    ArrayList lstName;
     private Contact lastSelectedContact;
     private Menu menu;
     private Contact c;
+    private MyDB db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,10 +57,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         listContact = new ArrayList<Contact>();
+        db = new MyDB(this,"ContactDataBaseK", null, 1);
+        db.addContact(new Contact(2,"B", "0819", "le308934@gamil.com",false,"https://inkythuatso.com/uploads/thumbnails/800/2022/03/anh-dai-dien-facebook-dep-cho-nam-30-28-16-26-50.jpg"));
+        listContact = db.getAllContact();
 
-        listContact.add(new Contact(1,"A", "081","le308934@gmail.com", false,"content://media/external/images/media/23"));
-        listContact.add(new Contact(2,"B", "0819", "le308934@gamil.com",false,"https://inkythuatso.com/uploads/thumbnails/800/2022/03/anh-dai-dien-facebook-dep-cho-nam-30-28-16-26-50.jpg"));
-        listContact.add(new Contact(3,"C", "08194","le308934@gamil.com", false,"https://inkythuatso.com/uploads/thumbnails/800/2022/03/anh-dai-dien-facebook-dep-cho-nam-40-28-16-27-26.jpg"));
+//        listContact.add(new Contact(1,"A", "081","le308934@gmail.com", false,"content://media/external/images/media/23"));
+//        listContact.add(new Contact(2,"B", "0819", "le308934@gamil.com",false,"https://inkythuatso.com/uploads/thumbnails/800/2022/03/anh-dai-dien-facebook-dep-cho-nam-30-28-16-26-50.jpg"));
+//        listContact.add(new Contact(3,"C", "08194","le308934@gamil.com", false,"https://inkythuatso.com/uploads/thumbnails/800/2022/03/anh-dai-dien-facebook-dep-cho-nam-40-28-16-27-26.jpg"));
         //adapter = new Adapter(listContact,this);
         adapter = new Adapter(listContact, this, new Adapter.OnAvatarClickListener() {
             @Override
@@ -112,26 +115,26 @@ public class MainActivity extends AppCompatActivity {
 
     }
     public void XoaDS(){
-            ArrayList<Contact> phanTuCanLoaiBo = new ArrayList<>();
+            ArrayList<Integer> phanTuCanLoaiBo = new ArrayList<>();
 
-            // Lặp qua danh sách ngược từ cuối danh sách
             for (int i = listContact.size() - 1; i >= 0; i--) {
                 if (listContact.get(i).isStatus()) {
-                    // Thêm phần tử cần loại bỏ vào danh sách tạm thời
-                    phanTuCanLoaiBo.add(listContact.get(i));
+                    phanTuCanLoaiBo.add(listContact.get(i).getId());
                 }
             }
 
-            // Loại bỏ các phần tử đã chọn khỏi danh sách gốc
         AlertDialog.Builder dg= new AlertDialog.Builder(MainActivity.this);
         dg.setTitle("Thông báo");
         dg.setMessage("Bạn có chắc chắn muốn xóa không?");
         dg.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                listContact.removeAll(phanTuCanLoaiBo);
-                // Cập nhật giao diện
-                lstContact.setAdapter(adapter);
+                for(int x: phanTuCanLoaiBo)
+                    db.deleteContact(x);
+
+                listContact = db.getAllContact();
+                adapter.setData(listContact);
+                adapter.notifyDataSetChanged();
 
             }
         });
@@ -158,10 +161,13 @@ public class MainActivity extends AppCompatActivity {
             String phone = b.getString("phone");
             String image_path= b.getString("img");
             String email = b.getString("email");
-            Contact ct = new Contact(id,name,phone,email,false,image_path);
-                listContact.add(ct);
-                lstContact.setAdapter(adapter);
-                Toast.makeText(this,"Thanh cong",Toast.LENGTH_SHORT).show();
+            Boolean status = b.getBoolean("status");
+            Contact ct = new Contact(id,name,phone,email,status,image_path);
+                db.addContact(ct);
+                listContact = db.getAllContact();
+                adapter.setData(listContact);
+                adapter.notifyDataSetChanged();
+            Toast.makeText(this,"Thanh cong",Toast.LENGTH_SHORT).show();
         }
 //        if (requestCode == PICK_IMAGE && resultCode == RESULT_OK && data != null) {
 //            Uri selectedImage = data.getData();
@@ -187,11 +193,10 @@ public class MainActivity extends AppCompatActivity {
             String phone = bl.getString("Phone_Edit");
             String img= bl.getString("Image_Edit");
             String email= bl.getString("Email_Edit");
-            c.setEmail(email);
-            c.setId(id);
-            c.setName(name);
-            c.setPhonenumber(phone);
-            c.setImagePath(img);
+            Boolean sta = bl.getBoolean("Status_Edit");
+            c.setContact(id,name,phone,email,sta,img);
+            db.updateContact(id,c);
+            adapter.setData(listContact);
             adapter.notifyDataSetChanged();
         }
 
@@ -252,7 +257,9 @@ public class MainActivity extends AppCompatActivity {
             edit_item();
         }
         else if(item.getItemId()==R.id.menu_delete){
-            listContact.remove(c);
+            db.deleteContact(c.getId());
+            listContact = db.getAllContact();
+            adapter.setData(listContact);
             adapter.notifyDataSetChanged();
        }
         else if(item.getItemId()== R.id.menu_call){
@@ -269,6 +276,12 @@ public class MainActivity extends AppCompatActivity {
             Intent i = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + c.getPhonenumber()));
             startActivity(i);
         }
+//        else if(item.getItemId() == R.id.menu_fb) {
+//            // Replace "facebook_username" with the actual username or profile ID
+//            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/" + facebookUsername));
+//            startActivity(inmvc kttfv2 igiu5486uy
+//            tent);
+//        }
         return super.onContextItemSelected(item);
     }
     public void edit_item(){
@@ -279,6 +292,7 @@ public class MainActivity extends AppCompatActivity {
         b.putString("name", c.getName());
         b.putString("Phone",c.getPhonenumber());
         b.putString("Email",c.getEmail());
+        b.putBoolean("Statu",c.isStatus());
        i.putExtras(b);
         startActivityForResult(i,300);
     }

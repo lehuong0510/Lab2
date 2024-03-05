@@ -9,6 +9,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -32,7 +33,7 @@ public class Add_Activity extends AppCompatActivity {
     ImageView img;
     ArrayList<Integer> iddaco;
     String image_path;
-
+    CheckBox status;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,6 +86,8 @@ public class Add_Activity extends AppCompatActivity {
                         b.putString("phone", phone.getText().toString());
                         b.putString("img",image_path);
                         b.putString("email",email.getText().toString());
+                        b.putBoolean("status", status.isChecked());
+                        Log.d("Status", "onClick: " + status.isChecked());
                         i.putExtras(b);
                         setResult(150,i);
                         finish();
@@ -130,6 +133,7 @@ public class Add_Activity extends AppCompatActivity {
         btnCancel = findViewById(R.id.btnCancel);
         img = findViewById(R.id.img_add);
         email = findViewById(R.id.edit_Name);
+        status = findViewById(R.id.add_status);
     }
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

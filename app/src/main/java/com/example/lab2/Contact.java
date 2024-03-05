@@ -15,7 +15,14 @@ public class Contact {
         this.status = Status;
         this.ImagePath = ImagePath;
     }
-
+    public void setContact(int id, String name, String phoneNumber, String email, boolean status, String imagePath) {
+        this.id = id;
+        this.name = name;
+        this.phonenumber = phoneNumber;
+        this.email = email;
+        this.status = status;
+        this.ImagePath = imagePath;
+    }
 
 
     public String getName() {
