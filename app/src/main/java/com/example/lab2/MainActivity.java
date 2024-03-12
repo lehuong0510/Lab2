@@ -6,8 +6,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int PICK_IMAGE = 1;
     private static final int PERMISSION_REQUEST_CODE = 100;
     private int selectedItemId;
-    protected EditText name;
+    protected EditText txtSearch;
     protected ListView lstContact;
     protected Button btnAdd;
     protected Button btnXoa;
@@ -42,6 +44,9 @@ public class MainActivity extends AppCompatActivity {
     private Menu menu;
     private Contact c;
     private MyDB db;
+    private ContentProvider cp;
+    int PERMISSION_REQUEST_CODE_CONTACT =123;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,26 +61,30 @@ public class MainActivity extends AppCompatActivity {
                     PERMISSION_REQUEST_CODE);
         }
 
-        listContact = new ArrayList<Contact>();
-        db = new MyDB(this,"ContactDataBaseK", null, 1);
-        db.addContact(new Contact(2,"B", "0819", "le308934@gamil.com",false,"https://inkythuatso.com/uploads/thumbnails/800/2022/03/anh-dai-dien-facebook-dep-cho-nam-30-28-16-26-50.jpg"));
-        listContact = db.getAllContact();
 
-//        listContact.add(new Contact(1,"A", "081","le308934@gmail.com", false,"content://media/external/images/media/23"));
+
+        listContact = new ArrayList<Contact>();
+//        db = new MyDB(this,"ContactDataBaseK", null, 1);
+//        db.addContact(new Contact(2,"B", "0819", "le308934@gamil.com",false,"https://inkythuatso.com/uploads/thumbnails/800/2022/03/anh-dai-dien-facebook-dep-cho-nam-30-28-16-26-50.jpg"));
+//        listContact = db.getAllContact();
+//
+////        listContact.add(new Contact(1,"A", "081","le308934@gmail.com", false,"content://media/external/images/media/23"));
 //        listContact.add(new Contact(2,"B", "0819", "le308934@gamil.com",false,"https://inkythuatso.com/uploads/thumbnails/800/2022/03/anh-dai-dien-facebook-dep-cho-nam-30-28-16-26-50.jpg"));
 //        listContact.add(new Contact(3,"C", "08194","le308934@gamil.com", false,"https://inkythuatso.com/uploads/thumbnails/800/2022/03/anh-dai-dien-facebook-dep-cho-nam-40-28-16-27-26.jpg"));
         //adapter = new Adapter(listContact,this);
-        adapter = new Adapter(listContact, this, new Adapter.OnAvatarClickListener() {
-            @Override
-            public void onAvatarClick(Contact contact) {
-                // Xử lý sự kiện khi người dùng nhấn vào hình đại diện
-                lastSelectedContact = contact;
-                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(intent, PICK_IMAGE);
-            }
-        }, name);
+        adapter = new Adapter(listContact, this);
+//                new Adapter.OnAvatarClickListener() {
+//            @Override
+//            public void onAvatarClick(Contact contact) {
+//                // Xử lý sự kiện khi người dùng nhấn vào hình đại diện
+//                lastSelectedContact = contact;
+//                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//                startActivityForResult(intent, PICK_IMAGE);
+//            }
+//        });
 
         lstContact.setAdapter(adapter);
+        ShowContact();
         registerForContextMenu(lstContact);
         lstContact.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
@@ -106,9 +115,26 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(i,100);
             }
         });
+        txtSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                adapter.getFilter().filter(s.toString());
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
     }
     public void FindId(){
-        name = findViewById(R.id.txt_Name);
+        txtSearch = findViewById(R.id.txt_Name);
         lstContact = findViewById(R.id.lstContact);
         btnAdd = findViewById(R.id.btnThem);
         btnXoa= findViewById(R.id.btnXoa);
@@ -188,7 +214,7 @@ public class MainActivity extends AppCompatActivity {
 //        }
         if(requestCode== 300&& resultCode==170){
             Bundle bl =data.getExtras();
-            int id = bl.getInt("ID_edit");
+            int id = bl.getInt("ID_Edit");
             String name = bl.getString("Name_Edit");
             String phone = bl.getString("Phone_Edit");
             String img= bl.getString("Image_Edit");
@@ -196,6 +222,7 @@ public class MainActivity extends AppCompatActivity {
             Boolean sta = bl.getBoolean("Status_Edit");
             c.setContact(id,name,phone,email,sta,img);
             db.updateContact(id,c);
+            listContact = db.getAllContact();
             adapter.setData(listContact);
             adapter.notifyDataSetChanged();
         }
@@ -295,5 +322,20 @@ public class MainActivity extends AppCompatActivity {
         b.putBoolean("Statu",c.isStatus());
        i.putExtras(b);
         startActivityForResult(i,300);
+    }
+    //Cap quyen su dung ContentPro
+
+    private void ShowContact(){
+
+
+    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&checkSelfPermission(Manifest.permission.READ_CONTACTS)!=PackageManager.PERMISSION_GRANTED){
+        requestPermissions(new String[]{Manifest.permission.READ_CONTACTS},PERMISSION_REQUEST_CODE_CONTACT);
+    }
+    else {
+        cp= new ContentProvider(this);
+        listContact = cp.getAllContact();
+        adapter = new Adapter(listContact,MainActivity.this);
+        lstContact.setAdapter(adapter);
+    }
     }
 }

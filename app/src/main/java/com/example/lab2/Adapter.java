@@ -11,6 +11,8 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,7 +20,7 @@ import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
-public class Adapter extends BaseAdapter {
+public class Adapter extends BaseAdapter implements Filterable {
 
 
     public OnAvatarClickListener getOnAvatarClickListener() {
@@ -27,6 +29,51 @@ public class Adapter extends BaseAdapter {
 
     public void setOnAvatarClickListener(OnAvatarClickListener onAvatarClickListener) {
         this.onAvatarClickListener = onAvatarClickListener;
+    }
+
+    @Override
+    public Filter getFilter() {
+        Filter f = new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                FilterResults fr = new FilterResults();
+                // luu tamm dât và databackup
+                if(databackup==null){
+                    databackup = new ArrayList<>(data);
+                }
+                //Neu chuoi de filter la rong thi khoi phuc du lieu
+                if(constraint == null || constraint.length()==0){
+                    fr.count = databackup.size();
+                    fr.values = databackup;
+                }
+                // Neu khong rong thi thuc hien fiter
+
+                else {
+                    ArrayList<Contact> newdata = new ArrayList<>();
+                    for(Contact c: databackup){
+                        if(c.getName().toLowerCase().contains(constraint.toString().toLowerCase()))
+                            newdata.add(c);
+                        fr.count= newdata.size();
+                        fr.values = newdata;
+                    }
+
+                }
+                return  fr;
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                data = new ArrayList<Contact>();
+                ArrayList<Contact> tmp = (ArrayList<Contact>)results.values;
+                for(Contact c:tmp){
+                    data.add(c);
+                    notifyDataSetChanged();
+                }
+            }
+        };
+        return  f;
+
+
     }
 
     public interface OnAvatarClickListener {
@@ -52,11 +99,9 @@ public class Adapter extends BaseAdapter {
     public void setData(ArrayList<Contact> data) {
         this.data = data;
     }
-    public  Adapter(ArrayList<Contact> data, Activity context, OnAvatarClickListener onAvatarClickListener, EditText txtName){
+    public  Adapter(ArrayList<Contact> data, Activity context){
         this.data = data;
-        this.context = context;
-        this.onAvatarClickListener = onAvatarClickListener;
-        this.txtName = txtName;
+        this.context = context;//////
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
     @Override

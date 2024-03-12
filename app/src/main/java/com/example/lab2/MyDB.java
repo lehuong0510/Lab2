@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -97,6 +98,7 @@ public class MyDB extends SQLiteOpenHelper {
         values.put(image_path, contact.getImagePath());
         db.update(TableName, values, id + "=?", new String[]{String.valueOf(Id)});
         db.close();
+        Log.d("k", "updateContact: "+Id);
 
     }
     public void deleteContact(int id){
